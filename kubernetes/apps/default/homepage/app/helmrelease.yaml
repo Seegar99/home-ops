@@ -12,6 +12,8 @@ spec:
     controllers:
       homepage:
         strategy: RollingUpdate
+        serviceAccount:
+          name: homepage
         containers:
           app:
             image:
@@ -32,8 +34,6 @@ spec:
               limits:
                 memory: 512Mi
     defaultPodOptions:
-      serviceAccountName: homepage
-      automountServiceAccountToken: true
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
