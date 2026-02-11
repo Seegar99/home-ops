@@ -55,7 +55,9 @@ spec:
                 port: 8096
     persistence:
       config:
-        type: emptyDir
+        type: nfs
+        server: 192.168.1.196
+        path: /var/nfs/shared/appdata/jellyfin
         globalMounts:
           - path: /config
       cache:
