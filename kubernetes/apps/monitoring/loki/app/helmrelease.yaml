@@ -14,8 +14,12 @@ spec:
       auth_enabled: false
       commonConfig:
         replication_factor: 1
+        path_prefix: /tmp/loki
       storage:
         type: filesystem
+        filesystem:
+          chunks_directory: /tmp/loki/chunks
+          rules_directory: /tmp/loki/rules
       schemaConfig:
         configs:
           - from: "2024-01-01"
@@ -25,12 +29,13 @@ spec:
             index:
               prefix: loki_index_
               period: 24h
-    extraVolumes:
-      - name: data
-        emptyDir: {}
-    extraVolumeMounts:
-      - name: data
-        mountPath: /var/loki
+      rulerConfig:
+        storage:
+          type: local
+          local:
+            directory: /tmp/loki/rules
+        wal:
+          dir: /tmp/loki/ruler-wal
     singleBinary:
       replicas: 1
       persistence:
