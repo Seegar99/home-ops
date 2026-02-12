@@ -1,0 +1,54 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kube-prometheus-stack
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: kube-prometheus-stack
+  interval: 1h
+  values:
+    crds:
+      enabled: true
+    prometheus:
+      prometheusSpec:
+        replicas: 1
+        retention: 14d
+        retentionSize: 10GB
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              resources:
+                requests:
+                  storage: 20Gi
+        resources:
+          requests:
+            cpu: 100m
+            memory: 512Mi
+          limits:
+            memory: 4Gi
+    alertmanager:
+      alertmanagerSpec:
+        replicas: 1
+        storage:
+          volumeClaimTemplate:
+            spec:
+              resources:
+                requests:
+                  storage: 1Gi
+    grafana:
+      persistence:
+        enabled: true
+        size: 2Gi
+      adminPassword: "admin"
+      additionalDataSources:
+        - name: Loki
+          type: loki
+          url: http://loki.monitoring.svc.cluster.local:3100
+          access: proxy
+          isDefault: false
+    nodeExporter:
+      enabled: true
+    kubeStateMetrics:
+      enabled: true
