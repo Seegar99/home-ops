@@ -9,5 +9,5 @@ components:
 resources:
   - ./namespace.yaml
   - ./echo/ks.yaml
-  - ./homepage/ks.yaml
+  - ./homarr/ks.yaml
   - ./jellyfin/ks.yaml
