@@ -25,16 +25,16 @@ spec:
             index:
               prefix: loki_index_
               period: 24h
+    extraVolumes:
+      - name: data
+        emptyDir: {}
+    extraVolumeMounts:
+      - name: data
+        mountPath: /var/loki
     singleBinary:
       replicas: 1
       persistence:
         enabled: false
-      extraVolumes:
-        - name: data
-          emptyDir: {}
-      extraVolumeMounts:
-        - name: data
-          mountPath: /var/loki
       resources:
         requests:
           cpu: 50m
