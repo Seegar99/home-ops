@@ -39,9 +39,16 @@ spec:
                 requests:
                   storage: 1Gi
     grafana:
+      envFromSecrets:
+        - name: grafana-discord-webhook
       sidecar:
         dashboards:
           enabled: true
+          searchNamespace: ALL
+        alerts:
+          enabled: true
+          label: grafana_alert
+          labelValue: "1"
           searchNamespace: ALL
       dashboardProviders:
         dashboardproviders.yaml:
@@ -60,6 +67,26 @@ spec:
           trivy-operator:
             gnetId: 17813
             revision: 2
+            datasource: Prometheus
+          node-exporter-full:
+            gnetId: 1860
+            revision: 37
+            datasource: Prometheus
+          flux-cluster:
+            gnetId: 16714
+            revision: 1
+            datasource: Prometheus
+          cert-manager:
+            gnetId: 20842
+            revision: 3
+            datasource: Prometheus
+          coredns:
+            gnetId: 15762
+            revision: 18
+            datasource: Prometheus
+          cloudflare-tunnel:
+            gnetId: 17457
+            revision: 1
             datasource: Prometheus
       persistence:
         enabled: true

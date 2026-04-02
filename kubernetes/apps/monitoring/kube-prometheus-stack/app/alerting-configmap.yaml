@@ -1,0 +1,244 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-alerting-config
+  labels:
+    grafana_alert: "1"
+data:
+  contactpoints.yaml: |
+    apiVersion: 1
+    contactPoints:
+      - orgId: 1
+        name: discord
+        receivers:
+          - uid: discord-receiver
+            type: discord
+            settings:
+              url: $discord-webhook-url
+              use_discord_username: true
+  policies.yaml: |
+    apiVersion: 1
+    policies:
+      - orgId: 1
+        receiver: discord
+        group_by:
+          - alertname
+          - namespace
+        group_wait: 30s
+        group_interval: 5m
+        repeat_interval: 12h
+  rules.yaml: |
+    apiVersion: 1
+    groups:
+      - orgId: 1
+        name: homelab-alerts
+        folder: Alerts
+        interval: 1m
+        rules:
+          - uid: disk-usage-warning
+            title: Disk Usage High
+            condition: C
+            data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: (1 - node_filesystem_avail_bytes{mountpoint="/",fstype!="tmpfs"} / node_filesystem_size_bytes{mountpoint="/",fstype!="tmpfs"}) * 100
+                  instant: true
+              - refId: B
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: __expr__
+                model:
+                  type: reduce
+                  expression: A
+                  reducer: last
+              - refId: C
+                datasourceUid: __expr__
+                model:
+                  type: threshold
+                  expression: B
+                  conditions:
+                    - evaluator:
+                        type: gt
+                        params:
+                          - 80
+            for: 5m
+            annotations:
+              summary: "Disk usage above 80% on {{ index $labels \"instance\" }}"
+            labels:
+              severity: warning
+
+          - uid: pod-crashloop
+            title: Pod CrashLoopBackOff
+            condition: C
+            data:
+              - refId: A
+                relativeTimeRange:
+                  from: 900
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: increase(kube_pod_container_status_restarts_total[15m]) > 3
+                  instant: true
+              - refId: B
+                datasourceUid: __expr__
+                model:
+                  type: reduce
+                  expression: A
+                  reducer: last
+              - refId: C
+                datasourceUid: __expr__
+                model:
+                  type: threshold
+                  expression: B
+                  conditions:
+                    - evaluator:
+                        type: gt
+                        params:
+                          - 0
+            for: 5m
+            annotations:
+              summary: "Pod {{ index $labels \"namespace\" }}/{{ index $labels \"pod\" }} is crash looping"
+            labels:
+              severity: critical
+
+          - uid: cert-expiry
+            title: Certificate Expiring Soon
+            condition: C
+            data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: (certmanager_certificate_expiration_timestamp_seconds - time()) / 86400
+                  instant: true
+              - refId: B
+                datasourceUid: __expr__
+                model:
+                  type: reduce
+                  expression: A
+                  reducer: last
+              - refId: C
+                datasourceUid: __expr__
+                model:
+                  type: threshold
+                  expression: B
+                  conditions:
+                    - evaluator:
+                        type: lt
+                        params:
+                          - 14
+            for: 1h
+            annotations:
+              summary: "Certificate {{ index $labels \"name\" }} expires in {{ index $values \"B\" }} days"
+            labels:
+              severity: warning
+
+          - uid: helmrelease-not-ready
+            title: HelmRelease Not Ready
+            condition: C
+            data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: gotk_reconcile_condition{type="Ready",status="False",kind="HelmRelease"} == 1
+                  instant: true
+              - refId: B
+                datasourceUid: __expr__
+                model:
+                  type: reduce
+                  expression: A
+                  reducer: last
+              - refId: C
+                datasourceUid: __expr__
+                model:
+                  type: threshold
+                  expression: B
+                  conditions:
+                    - evaluator:
+                        type: gt
+                        params:
+                          - 0
+            for: 10m
+            annotations:
+              summary: "HelmRelease {{ index $labels \"name\" }} in {{ index $labels \"namespace\" }} is not ready"
+            labels:
+              severity: warning
+
+          - uid: node-not-ready
+            title: Node Not Ready
+            condition: C
+            data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: kube_node_status_condition{condition="Ready",status="true"} == 0
+                  instant: true
+              - refId: B
+                datasourceUid: __expr__
+                model:
+                  type: reduce
+                  expression: A
+                  reducer: last
+              - refId: C
+                datasourceUid: __expr__
+                model:
+                  type: threshold
+                  expression: B
+                  conditions:
+                    - evaluator:
+                        type: gt
+                        params:
+                          - 0
+            for: 5m
+            annotations:
+              summary: "Node {{ index $labels \"node\" }} is not ready"
+            labels:
+              severity: critical
+
+          - uid: memory-high
+            title: High Memory Usage
+            condition: C
+            data:
+              - refId: A
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                datasourceUid: prometheus
+                model:
+                  expr: (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100
+                  instant: true
+              - refId: B
+                datasourceUid: __expr__
+                model:
+                  type: reduce
+                  expression: A
+                  reducer: last
+              - refId: C
+                datasourceUid: __expr__
+                model:
+                  type: threshold
+                  expression: B
+                  conditions:
+                    - evaluator:
+                        type: gt
+                        params:
+                          - 85
+            for: 5m
+            annotations:
+              summary: "Memory usage above 85% on {{ index $labels \"instance\" }}"
+            labels:
+              severity: warning

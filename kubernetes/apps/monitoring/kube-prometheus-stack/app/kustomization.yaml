@@ -6,3 +6,5 @@ resources:
   - ./ocirepository.yaml
   - ./httproute.yaml
   - ./secret.sops.yaml
+  - ./discord-secret.sops.yaml
+  - ./alerting-configmap.yaml
