@@ -1,0 +1,154 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: gatus
+spec:
+  chart:
+    spec:
+      chart: gatus
+      version: 1.5.0
+      sourceRef:
+        kind: HelmRepository
+        name: twin
+  interval: 1h
+  valuesFrom:
+    - kind: Secret
+      name: gatus-discord-webhook
+      valuesKey: DISCORD_WEBHOOK_URL
+      targetPath: config.alerting.discord.webhook-url
+  values:
+    persistence:
+      enabled: true
+      size: 1Gi
+      storageClassName: local-path
+      accessModes:
+        - ReadWriteOnce
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        memory: 128Mi
+    ingress:
+      enabled: false
+    serviceMonitor:
+      enabled: true
+    config:
+      storage:
+        type: sqlite
+        path: /data/data.db
+      metrics: true
+      ui:
+        title: Home Lab Status
+        header: Home Lab Status
+        description: Real-time endpoint monitoring for my homelab
+        buttons:
+          - name: GitHub
+            link: https://github.com/Seegar99/home-ops
+      alerting:
+        discord:
+          webhook-url: "placeholder"
+          default-alert:
+            description: "Service health check failed"
+            send-on-resolved: true
+            failure-threshold: 3
+            success-threshold: 2
+      endpoints:
+        - name: Grafana
+          group: External
+          url: https://grafana.colinpobrien.com
+          interval: 2m
+          conditions:
+            - "[STATUS] == 200"
+            - "[RESPONSE_TIME] < 5000"
+          alerts:
+            - type: discord
+              description: "Grafana is down"
+              send-on-resolved: true
+        - name: Jellyfin
+          group: External
+          url: https://jellyfin.colinpobrien.com
+          interval: 2m
+          conditions:
+            - "[STATUS] == 200"
+            - "[RESPONSE_TIME] < 5000"
+          alerts:
+            - type: discord
+              description: "Jellyfin is down"
+              send-on-resolved: true
+        - name: Echo
+          group: External
+          url: https://echo.colinpobrien.com
+          interval: 2m
+          conditions:
+            - "[STATUS] == 200"
+            - "[RESPONSE_TIME] < 5000"
+          alerts:
+            - type: discord
+              description: "Echo is down"
+              send-on-resolved: true
+        - name: Flux Webhook
+          group: External
+          url: https://flux-webhook.colinpobrien.com/hook/
+          interval: 5m
+          conditions:
+            - "[STATUS] any (200, 404)"
+            - "[CONNECTED] == true"
+          alerts:
+            - type: discord
+              description: "Flux webhook endpoint is unreachable"
+              send-on-resolved: true
+        - name: Prometheus
+          group: Internal
+          url: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090/-/healthy
+          interval: 2m
+          conditions:
+            - "[STATUS] == 200"
+          alerts:
+            - type: discord
+              description: "Prometheus is down"
+              send-on-resolved: true
+        - name: Alertmanager
+          group: Internal
+          url: http://kube-prometheus-stack-alertmanager.monitoring.svc.cluster.local:9093/-/healthy
+          interval: 2m
+          conditions:
+            - "[STATUS] == 200"
+          alerts:
+            - type: discord
+              description: "Alertmanager is down"
+              send-on-resolved: true
+        - name: Loki
+          group: Internal
+          url: http://loki.monitoring.svc.cluster.local:3100/ready
+          interval: 2m
+          conditions:
+            - "[STATUS] == 200"
+          alerts:
+            - type: discord
+              description: "Loki is down"
+              send-on-resolved: true
+        - name: CoreDNS
+          group: Internal
+          url: 8.8.8.8
+          dns:
+            query-name: kubernetes.default.svc.cluster.local
+            query-type: A
+          interval: 2m
+          conditions:
+            - "[DNS_RCODE] == NOERROR"
+          alerts:
+            - type: discord
+              description: "CoreDNS is not resolving"
+              send-on-resolved: true
+        - name: Cloudflare Tunnel
+          group: Internal
+          url: http://cloudflare-tunnel.network.svc.cluster.local:2000/ready
+          interval: 5m
+          conditions:
+            - "[STATUS] == 200"
+          alerts:
+            - type: discord
+              description: "Cloudflare Tunnel is down"
+              send-on-resolved: true
