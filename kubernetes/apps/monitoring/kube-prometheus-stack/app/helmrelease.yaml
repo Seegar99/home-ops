@@ -66,6 +66,7 @@ spec:
         size: 2Gi
       admin:
         existingSecret: kube-prometheus-stack-grafana-secret
+        userKey: admin-user
         passwordKey: admin-password
       additionalDataSources:
         - name: Loki
