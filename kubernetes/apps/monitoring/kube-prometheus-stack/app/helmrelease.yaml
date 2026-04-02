@@ -43,11 +43,24 @@ spec:
         dashboards:
           enabled: true
           searchNamespace: ALL
+      dashboardProviders:
+        dashboardproviders.yaml:
+          apiVersion: 1
+          providers:
+            - name: default
+              orgId: 1
+              folder: ""
+              type: file
+              disableDeletion: false
+              editable: true
+              options:
+                path: /var/lib/grafana/dashboards/default
       dashboards:
-        trivy-operator:
-          gnetId: 17813
-          revision: 2
-          datasource: Prometheus
+        default:
+          trivy-operator:
+            gnetId: 17813
+            revision: 2
+            datasource: Prometheus
       persistence:
         enabled: true
         size: 2Gi
