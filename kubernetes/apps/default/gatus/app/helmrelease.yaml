@@ -130,7 +130,7 @@ spec:
               send-on-resolved: true
         - name: CoreDNS
           group: Internal
-          url: udp://kube-dns.kube-system.svc.cluster.local:53
+          url: kube-dns.kube-system.svc.cluster.local
           dns:
             query-name: kubernetes.default.svc.cluster.local
             query-type: A
