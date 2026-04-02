@@ -130,7 +130,7 @@ spec:
               send-on-resolved: true
         - name: CoreDNS
           group: Internal
-          url: 8.8.8.8
+          url: udp://kube-dns.kube-system.svc.cluster.local:53
           dns:
             query-name: kubernetes.default.svc.cluster.local
             query-type: A
@@ -143,10 +143,10 @@ spec:
               send-on-resolved: true
         - name: Cloudflare Tunnel
           group: Internal
-          url: http://cloudflare-tunnel.network.svc.cluster.local:2000/ready
+          url: http://cloudflare-tunnel.network.svc.cluster.local:8080/
           interval: 5m
           conditions:
-            - "[STATUS] == 200"
+            - "[CONNECTED] == true"
           alerts:
             - type: discord
               description: "Cloudflare Tunnel is down"
