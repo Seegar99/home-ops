@@ -39,6 +39,13 @@ spec:
                 requests:
                   storage: 1Gi
     grafana:
+      initChownData:
+        enabled: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 472
+        runAsGroup: 472
+        fsGroup: 472
       envFromSecrets:
         - name: grafana-discord-webhook
       sidecar:
