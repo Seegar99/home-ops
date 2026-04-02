@@ -58,7 +58,7 @@ jobs:
                 fi
               fi
             done < "${file}"
-          done < <(find . -name "*.sops.yaml" -o -name "*.sops.yml" | tr '\n' '\0')
+          done < <(find . \( -name "*.sops.yaml" -o -name "*.sops.yml" \) -not -path "./.sops.yaml" -print0)
 
           if [ "${failed}" -eq 1 ]; then
             echo "::error::SOPS validation failed — unencrypted secrets detected"
