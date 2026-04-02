@@ -93,7 +93,6 @@ spec:
           url: https://flux-webhook.colinpobrien.com/hook/
           interval: 5m
           conditions:
-            - "[STATUS] any (200, 404)"
             - "[CONNECTED] == true"
           alerts:
             - type: discord
