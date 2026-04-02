@@ -141,6 +141,67 @@ spec:
             - type: discord
               description: "CoreDNS is not resolving"
               send-on-resolved: true
+        - name: Cloudflare DNS (1.1.1.1)
+          group: Internet
+          url: 1.1.1.1
+          dns:
+            query-name: colinpobrien.com
+            query-type: A
+          interval: 5m
+          conditions:
+            - "[DNS_RCODE] == NOERROR"
+            - "[RESPONSE_TIME] < 500"
+          alerts:
+            - type: discord
+              description: "Cloudflare DNS is not resolving"
+              send-on-resolved: true
+        - name: Google DNS (8.8.8.8)
+          group: Internet
+          url: 8.8.8.8
+          dns:
+            query-name: colinpobrien.com
+            query-type: A
+          interval: 5m
+          conditions:
+            - "[DNS_RCODE] == NOERROR"
+            - "[RESPONSE_TIME] < 500"
+          alerts:
+            - type: discord
+              description: "Google DNS is not resolving"
+              send-on-resolved: true
+        - name: Cloudflare (HTTPS)
+          group: Internet
+          url: https://1.1.1.1
+          interval: 5m
+          conditions:
+            - "[STATUS] == 200"
+            - "[RESPONSE_TIME] < 1000"
+          alerts:
+            - type: discord
+              description: "Cloudflare HTTPS unreachable - possible internet outage"
+              send-on-resolved: true
+        - name: Google (HTTPS)
+          group: Internet
+          url: https://www.google.com
+          interval: 5m
+          conditions:
+            - "[STATUS] == 200"
+            - "[RESPONSE_TIME] < 1000"
+          alerts:
+            - type: discord
+              description: "Google unreachable - possible internet outage"
+              send-on-resolved: true
+        - name: GitHub API
+          group: Internet
+          url: https://api.github.com
+          interval: 5m
+          conditions:
+            - "[STATUS] == 200"
+            - "[RESPONSE_TIME] < 2000"
+          alerts:
+            - type: discord
+              description: "GitHub API unreachable - Flux may not be able to pull"
+              send-on-resolved: true
         - name: Cloudflare Tunnel
           group: Internal
           url: http://cloudflare-tunnel.network.svc.cluster.local:8080/
