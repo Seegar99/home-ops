@@ -1,0 +1,67 @@
+---
+name: "SOPS Validation"
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "**.sops.yaml"
+      - "**.sops.yml"
+  push:
+    branches: ["main"]
+    paths:
+      - "**.sops.yaml"
+      - "**.sops.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sops-validate:
+    name: SOPS Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Validate SOPS encrypted files
+        run: |
+          failed=0
+          while IFS= read -r -d '' file; do
+            echo "Checking ${file}..."
+
+            # Verify sops metadata block exists
+            if ! grep -q "^sops:" "${file}"; then
+              echo "::error file=${file}::Missing sops metadata block — file is not encrypted"
+              failed=1
+              continue
+            fi
+
+            # Check for plaintext values in data/stringData fields
+            in_secret_block=false
+            while IFS= read -r line; do
+              # Detect start of data/stringData block
+              if echo "${line}" | grep -qE "^(data|stringData):"; then
+                in_secret_block=true
+                continue
+              fi
+              # Detect end of block (non-indented line that isn't blank)
+              if ${in_secret_block} && echo "${line}" | grep -qE "^[^ ]" && [ -n "${line}" ]; then
+                in_secret_block=false
+              fi
+              # Check values inside data/stringData blocks
+              if ${in_secret_block} && echo "${line}" | grep -qE "^\s+\S+:" ; then
+                if ! echo "${line}" | grep -q "ENC\["; then
+                  echo "::error file=${file}::Plaintext value found — ${line}"
+                  failed=1
+                fi
+              fi
+            done < "${file}"
+          done < <(find . -name "*.sops.yaml" -o -name "*.sops.yml" | tr '\n' '\0')
+
+          if [ "${failed}" -eq 1 ]; then
+            echo "::error::SOPS validation failed — unencrypted secrets detected"
+            exit 1
+          fi
+          echo "All SOPS files are properly encrypted"
