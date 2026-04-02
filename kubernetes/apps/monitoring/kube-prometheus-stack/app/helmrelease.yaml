@@ -16,6 +16,7 @@ spec:
         replicas: 1
         retention: 14d
         retentionSize: 10GB
+        serviceMonitorSelectorNilUsesHelmValues: false
         storageSpec:
           volumeClaimTemplate:
             spec:
@@ -38,10 +39,21 @@ spec:
                 requests:
                   storage: 1Gi
     grafana:
+      sidecar:
+        dashboards:
+          enabled: true
+          searchNamespace: ALL
+      dashboards:
+        trivy-operator:
+          gnetId: 17813
+          revision: 2
+          datasource: Prometheus
       persistence:
         enabled: true
         size: 2Gi
-      adminPassword: "admin"
+      admin:
+        existingSecret: kube-prometheus-stack-grafana-secret
+        passwordKey: admin-password
       additionalDataSources:
         - name: Loki
           type: loki

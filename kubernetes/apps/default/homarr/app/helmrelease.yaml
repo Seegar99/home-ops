@@ -29,8 +29,10 @@ spec:
               repository: ghcr.io/homarr-labs/homarr
               tag: latest
             env:
-              SECRET_ENCRYPTION_KEY: 20db5a15e8f612c4e3a163443295564c4f6863a309259cb9ffa162fc1593b731
               TZ: America/New_York
+            envFrom:
+              - secretRef:
+                  name: homarr-secret
             ports:
               - name: http
                 containerPort: 3000
