@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Setup kubeconform
-        uses: fluxcd/flux2/action@534684601ec8888beb0cc4f51117b59e97606c4d # v2.4.0
+        uses: fluxcd/flux2/action@5350425cdcd5fa015337e09fa502153c0275bd4b # v2.4.0
         with:
           version: "latest"
 
