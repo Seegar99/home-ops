@@ -14,8 +14,8 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/kareadita/kavita
-              tag: 0.8.4.10
+              repository: docker.io/jvmilazz0/kavita
+              tag: 0.9.0
             env:
               TZ: America/New_York
             ports:
