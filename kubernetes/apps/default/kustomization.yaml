@@ -11,3 +11,4 @@ resources:
   - ./echo/ks.yaml
   - ./gatus/ks.yaml
   - ./jellyfin/ks.yaml
+  - ./kavita/ks.yaml
