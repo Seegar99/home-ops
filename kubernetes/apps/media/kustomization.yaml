@@ -7,5 +7,6 @@ components:
   - ../../components/sops
 
 resources:
+  - ./namespace.yaml
   - ./kavita/ks.yaml
   - ./jellyfin/ks.yaml
