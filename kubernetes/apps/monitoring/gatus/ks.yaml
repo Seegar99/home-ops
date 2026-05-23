@@ -2,10 +2,10 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: kavita
+  name: gatus
 spec:
   interval: 1h
-  path: ./kubernetes/apps/default/kavita/app
+  path: ./kubernetes/apps/monitoring/gatus/app
   postBuild:
     substituteFrom:
       - name: cluster-secrets
@@ -15,5 +15,5 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  targetNamespace: default
+  targetNamespace: monitoring
   wait: false

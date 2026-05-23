@@ -12,3 +12,4 @@ resources:
   - ./loki/ks.yaml
   - ./alloy/ks.yaml
   - ./trivy-operator/ks.yaml
+  - ./gatus/ks.yaml
