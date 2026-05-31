@@ -10,6 +10,13 @@ machine:
           - bind
           - rshared
           - rw
+      - destination: /var/mnt/appdata
+        type: bind
+        source: /var/mnt/appdata
+        options:
+          - bind
+          - rshared
+          - rw
     nodeIP:
       validSubnets:
         - 192.168.1.0/24
