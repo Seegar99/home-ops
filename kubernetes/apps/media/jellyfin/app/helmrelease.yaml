@@ -69,9 +69,17 @@ spec:
         globalMounts:
           - path: /config
       cache:
-        type: emptyDir
+        type: hostPath
+        hostPath: /var/mnt/appdata/jellyfin-cache
+        hostPathType: DirectoryOrCreate
         globalMounts:
           - path: /cache
+      dri:
+        type: hostPath
+        hostPath: /dev/dri
+        hostPathType: Directory
+        globalMounts:
+          - path: /dev/dri
       media:
         type: nfs
         server: 192.168.1.196
