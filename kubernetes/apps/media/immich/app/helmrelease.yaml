@@ -19,9 +19,9 @@ spec:
               tag: v2.7.5
             env:
               IMMICH_PORT: "2283"
-              DB_URL: "postgres://immich:immich@immich-postgres.media.svc.cluster.local:5432/immich"
-              REDIS_HOSTNAME: "immich-redis.media.svc.cluster.local"
-              IMMICH_MACHINE_LEARNING_URL: "http://immich-machine-learning.media.svc.cluster.local:3003"
+              DB_URL: "postgres://immich:immich@immich-immich-postgres.media.svc.cluster.local:5432/immich"
+              REDIS_HOSTNAME: "immich-immich-redis.media.svc.cluster.local"
+              IMMICH_MACHINE_LEARNING_URL: "http://immich-immich-machine-learning.media.svc.cluster.local:3003"
             ports:
               - name: http
                 containerPort: 2283
@@ -159,17 +159,17 @@ spec:
             app:
               - path: /data
       postgres-data:
-        type: hostPath
-        hostPath: /var/mnt/appdata/immich-postgres
-        hostPathType: DirectoryOrCreate
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 10Gi
         advancedMounts:
           immich-postgres:
             app:
               - path: /var/lib/postgresql/data
       ml-cache:
-        type: hostPath
-        hostPath: /var/mnt/appdata/immich-ml-cache
-        hostPathType: DirectoryOrCreate
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 10Gi
         advancedMounts:
           immich-machine-learning:
             app:
