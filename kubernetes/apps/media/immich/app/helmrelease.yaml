@@ -57,6 +57,12 @@ spec:
 
       immich-postgres:
         strategy: RollingUpdate
+        pod:
+          securityContext:
+            runAsNonRoot: false
+            runAsUser: 999
+            runAsGroup: 999
+            fsGroup: 999
         containers:
           app:
             image:
@@ -70,6 +76,8 @@ spec:
             ports:
               - name: tcp-postgres
                 containerPort: 5432
+            securityContext:
+              runAsNonRoot: false
             resources:
               requests:
                 cpu: 50m
@@ -145,14 +153,14 @@ spec:
       library:
         type: nfs
         server: 192.168.1.196
-        path: /var/nfs/shared/photos/Immich
+        path: /var/nfs/shared/photos
         advancedMounts:
           immich-server:
             app:
               - path: /data
       postgres-data:
         type: hostPath
-        hostPath: /var/mnt/appdata/immich/postgres
+        hostPath: /var/mnt/appdata/immich-postgres
         hostPathType: DirectoryOrCreate
         advancedMounts:
           immich-postgres:
@@ -160,7 +168,7 @@ spec:
               - path: /var/lib/postgresql/data
       ml-cache:
         type: hostPath
-        hostPath: /var/mnt/appdata/immich/ml-cache
+        hostPath: /var/mnt/appdata/immich-ml-cache
         hostPathType: DirectoryOrCreate
         advancedMounts:
           immich-machine-learning:
