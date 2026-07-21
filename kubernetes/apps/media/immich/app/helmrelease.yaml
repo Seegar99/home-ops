@@ -16,7 +16,7 @@ spec:
           app:
             image:
               repository: ghcr.io/immich-app/immich-server
-              tag: v2.7.5
+              tag: v3.0.3
             env:
               IMMICH_PORT: "2283"
               DB_URL: "postgres://immich:immich@immich-immich-postgres.media.svc.cluster.local:5432/immich"
@@ -41,7 +41,7 @@ spec:
           app:
             image:
               repository: ghcr.io/immich-app/immich-machine-learning
-              tag: v2.7.5
+              tag: v3.0.3
             ports:
               - name: http
                 containerPort: 3003
