@@ -159,9 +159,7 @@ spec:
             app:
               - path: /data
       postgres-data:
-        type: persistentVolumeClaim
-        accessMode: ReadWriteOnce
-        size: 10Gi
+        existingClaim: immich-postgres-data-v16
         advancedMounts:
           immich-postgres:
             app:
