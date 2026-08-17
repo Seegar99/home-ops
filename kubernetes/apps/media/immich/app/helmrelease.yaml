@@ -12,6 +12,9 @@ spec:
     controllers:
       immich-server:
         strategy: RollingUpdate
+        pod:
+          annotations:
+            secret.reloader.stakater.com/reload: immich-postgres-secret
         containers:
           app:
             image:
@@ -19,7 +22,11 @@ spec:
               tag: v3.1.0
             env:
               IMMICH_PORT: "2283"
-              DB_URL: "postgres://immich:immich@immich-immich-postgres.media.svc.cluster.local:5432/immich"
+              DB_URL:
+                valueFrom:
+                  secretKeyRef:
+                    name: immich-postgres-secret
+                    key: DB_URL
               REDIS_HOSTNAME: "immich-immich-redis.media.svc.cluster.local"
               IMMICH_MACHINE_LEARNING_URL: "http://immich-immich-machine-learning.media.svc.cluster.local:3003"
             ports:
@@ -58,6 +65,8 @@ spec:
       immich-postgres:
         strategy: RollingUpdate
         pod:
+          annotations:
+            secret.reloader.stakater.com/reload: immich-postgres-secret
           securityContext:
             runAsNonRoot: false
             runAsUser: 0
@@ -69,7 +78,11 @@ spec:
               tag: 16-vectorchord0.4.3-pgvectors0.2.0
             env:
               POSTGRES_USER: immich
-              POSTGRES_PASSWORD: immich
+              POSTGRES_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: immich-postgres-secret
+                    key: POSTGRES_PASSWORD
               POSTGRES_DB: immich
               POSTGRES_INITDB_ARGS: "--data-checksums"
             ports:

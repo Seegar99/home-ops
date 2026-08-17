@@ -4,7 +4,6 @@ kind: Kustomization
 resources:
   - ./helmrelease.yaml
   - ./ocirepository.yaml
-  - ./httproute.yaml
   - ./secret.sops.yaml
   - ./discord-secret.sops.yaml
   - ./alerting-configmap.yaml
