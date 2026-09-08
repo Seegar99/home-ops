@@ -4,14 +4,8 @@ name: "SOPS Validation"
 on:
   pull_request:
     branches: ["main"]
-    paths:
-      - "**.sops.yaml"
-      - "**.sops.yml"
   push:
     branches: ["main"]
-    paths:
-      - "**.sops.yaml"
-      - "**.sops.yml"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
