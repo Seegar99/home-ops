@@ -137,6 +137,34 @@
       matchDatasources: ["github-releases"],
       addLabels: ["renovate/github-release"],
     },
+        {
+      description: "Talos 1.14 supports Kubernetes up to 1.37. Raise this when Talos goes to a new minor.",
+      matchPackageNames: ["ghcr.io/siderolabs/kubelet"],
+      allowedVersions: "/^v1\\.(3[3-7])\\./",
+    },
+    {
+      description: "Core infra: one minor version per PR so upgrades go step by step",
+      matchPackageNames: [
+        "siderolabs/talos",
+        "ghcr.io/siderolabs/kubelet",
+        "quay.io/cilium/charts/cilium",
+      ],
+      separateMultipleMinor: true,
+    },
+    {
+      description: "Remind that merging does not upgrade the node",
+      matchPackageNames: ["siderolabs/talos", "ghcr.io/siderolabs/kubelet"],
+      prBodyNotes: [
+        "⚠️ Merging only changes `talos/talenv.yaml`. Afterwards run `task talos:upgrade-node IP=192.168.1.136` (Talos) or `task talos:upgrade-k8s` (Kubernetes), one minor version at a time.",
+      ],
+    },
+    {
+      description: "Don't auto-merge talosctl minor/major bumps ahead of the node",
+      matchManagers: ["mise"],
+      matchDepNames: ["aqua:siderolabs/talos"],
+      matchUpdateTypes: ["minor", "major"],
+      automerge: false,
+    },
   ],
   customManagers: [
     {
